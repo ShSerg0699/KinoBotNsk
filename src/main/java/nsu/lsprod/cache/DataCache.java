@@ -1,13 +1,14 @@
 package nsu.lsprod.cache;
 
 import nsu.lsprod.botapi.BotState;
+import nsu.lsprod.botapi.handlers.watchingschedule.UserInputData;
 
 public interface DataCache {
     void setUsersCurrentBotState(int userId, BotState botState);
 
     BotState getUsersCurrentBotState(int userId);
 
-//    UserProfileData getUserProfileData(int userId);
-//
-//    void saveUserProfileData(int userId, UserProfileData userProfileData);
+    UserInputData getUserInputData(int userId);
+
+    void saveUserInputData(int userId, UserInputData userProfileData);
 }

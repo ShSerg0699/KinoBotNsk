@@ -1,6 +1,7 @@
 package nsu.lsprod.cache;
 
 import nsu.lsprod.botapi.BotState;
+import nsu.lsprod.botapi.handlers.watchingschedule.UserInputData;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -9,7 +10,8 @@ import java.util.Map;
 @Component
 public class UserDataCache implements DataCache {
     private Map<Integer, BotState> usersBotStates = new HashMap<>();
-//    private Map<Integer, UserProfileData> usersProfileData = new HashMap<>();
+    private Map<Integer, UserInputData> usersInputData = new HashMap<>();
+
 
     @Override
     public void setUsersCurrentBotState(int userId, BotState botState) {
@@ -26,17 +28,17 @@ public class UserDataCache implements DataCache {
         return botState;
     }
 
-//    @Override
-//    public UserProfileData getUserProfileData(int userId) {
-//        UserProfileData userProfileData = usersProfileData.get(userId);
-//        if (userProfileData == null) {
-//            userProfileData = new UserProfileData();
-//        }
-//        return userProfileData;
-//    }
-//
-//    @Override
-//    public void saveUserProfileData(int userId, UserProfileData userProfileData) {
-//        usersProfileData.put(userId, userProfileData);
-//    }
+    @Override
+    public UserInputData getUserInputData(int userId) {
+        UserInputData userInputData = usersInputData.get(userId);
+        if (userInputData == null) {
+            userInputData = new UserInputData();
+        }
+        return userInputData;
+    }
+
+    @Override
+    public void saveUserInputData(int userId, UserInputData userInputData) {
+        usersInputData.put(userId, userInputData);
+    }
 }

@@ -6,7 +6,6 @@ import nsu.lsprod.database.entity.MovieSchedule;
 import nsu.lsprod.database.repository.CinemaRepository;
 import nsu.lsprod.database.repository.FilmRepository;
 import nsu.lsprod.database.repository.MovieScheduleRepository;
-import org.apache.logging.log4j.message.StringMapMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -102,9 +101,11 @@ public class MovieScheduleService {
             MovieSchedule movieSchedule = movieScheduleIterator.next();
             if(!movieSchedule.getCinema().equals(cinema)){
                 movieScheduleIterator.remove();
+                continue;
             }
             if(!movieSchedule.getFilm().equals(film)){
                 movieScheduleIterator.remove();
+                continue;
             }
         }
         List<Time> timeList = new ArrayList<>();
@@ -118,7 +119,7 @@ public class MovieScheduleService {
     public void addMovieSchedule(MovieSchedule movieSchedule){
         MovieSchedule newMovieSchedule = new MovieSchedule();
         Optional<Film> optionalFilm = filmRepository.findByName(movieSchedule.getFilm().getName());
-        if(!optionalFilm.isEmpty()){
+        if(!optionalFilm.isPresent()){
             return;
         }
         Film newFilm = new Film();
@@ -126,7 +127,7 @@ public class MovieScheduleService {
         newFilm.setFilmInfo(movieSchedule.getFilm().getFilmInfo());
         filmRepository.save(newFilm);
         Optional<Cinema> optionalCinema = cinemaRepository.findByName(movieSchedule.getCinema().getName());
-        if (!optionalCinema.isEmpty()){
+        if (!optionalCinema.isPresent()){
             return;
         }
         Cinema newCinema = new Cinema();
@@ -140,9 +141,13 @@ public class MovieScheduleService {
         movieScheduleRepository.save(newMovieSchedule);
     }
 
+    public List<Film> getAllFilm(){
+        return filmRepository.findAll();
+    }
+
     public Cinema findCinemaByName(String name){
         Optional<Cinema> optionalCinema = cinemaRepository.findByName(name);
-        if(optionalCinema.isEmpty()){
+        if(!optionalCinema.isPresent()){
             return null;
         }
         Cinema cinema = optionalCinema.get();
@@ -150,8 +155,8 @@ public class MovieScheduleService {
     }
 
     public Film findFilmByName(String name){
-        Optional<Film> optionalFilm = filmRepository.findByName(movieSchedule.getFilm().getName());
-        if(!optionalFilm.isEmpty()){
+        Optional<Film> optionalFilm = filmRepository.findByName(name);
+        if(!optionalFilm.isPresent()){
             return null;
         }
         Film film = optionalFilm.get();

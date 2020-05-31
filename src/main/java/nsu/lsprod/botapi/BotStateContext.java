@@ -23,9 +23,9 @@ public class BotStateContext {
     }
 
     private InputMessageHandler findMessageHandler(BotState currentState) {
-        if (isSearchingScheduleState(currentState)) {
-            return messageHandlers.get(BotState.SEARCHING_SCHEDULE);
-        }
+//        if (isSearchingScheduleState(currentState)) {
+//            return messageHandlers.get(BotState.SEARCHING_SCHEDULE);
+//        }
 
         return messageHandlers.get(currentState);
     }

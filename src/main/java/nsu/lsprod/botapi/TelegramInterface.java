@@ -1,6 +1,9 @@
 package nsu.lsprod.botapi;
 
+import nsu.lsprod.botapi.handlers.WatchingFilmInfo;
+import nsu.lsprod.botapi.handlers.watchingschedule.WatchingScheduleHandler;
 import nsu.lsprod.cache.UserDataCache;
+import nsu.lsprod.database.service.MovieScheduleService;
 import nsu.lsprod.service.MainMenuService;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
@@ -15,11 +18,17 @@ public class TelegramInterface {
     private BotStateContext botStateContext;
     private UserDataCache userDataCache;
     private MainMenuService mainMenuService;
+    private WatchingScheduleHandler watchingScheduleHandler;
+    private WatchingFilmInfo watchingFilmInfo;
 
-    public TelegramInterface(BotStateContext botStateContext, UserDataCache userDataCache, MainMenuService mainMenuService) {
+
+
+    public TelegramInterface(BotStateContext botStateContext, UserDataCache userDataCache, MainMenuService mainMenuService, MovieScheduleService movieScheduleService, WatchingScheduleHandler watchingScheduleHandler, WatchingFilmInfo watchingFilmInfo) {
         this.botStateContext = botStateContext;
         this.userDataCache = userDataCache;
         this.mainMenuService = mainMenuService;
+        this.watchingScheduleHandler = watchingScheduleHandler;
+        this.watchingFilmInfo = watchingFilmInfo;
     }
 
     public BotApiMethod<?> handleUpdate(Update update) {
@@ -48,24 +57,35 @@ public class TelegramInterface {
         switch (inputMsg) {
             case "/start":
                 botState = BotState.SHOW_MAIN_MENU;
+                userDataCache.setUsersCurrentBotState(userId, botState);
+                replyMessage = botStateContext.processInputMessage(botState, message);
                 break;
             case "Посмотреть расписание":
                 botState = BotState.SEARCHING_SCHEDULE;
+                userDataCache.setUsersCurrentBotState(userId, botState);
+                replyMessage = botStateContext.processInputMessage(botState, message);
                 break;
-            case "Настройки":
-                botState = BotState.SHOW_SETTING_MENU;
-                break;
+//            case "Настройки":
+//                botState = BotState.SHOW_SETTING_MENU;
+//                userDataCache.setUsersCurrentBotState(userId, botState);
+//                replyMessage = botStateContext.processInputMessage(botState, message);
+//                break;
             case "Посмотреть информацию о фильмах":
                 botState = BotState.ASK_FILM_INFO;
+                userDataCache.setUsersCurrentBotState(userId, botState);
+                replyMessage = botStateContext.processInputMessage(botState, message);
                 break;
             default:
-                botState = userDataCache.getUsersCurrentBotState(userId);
+                botState = BotState.SEARCHING_SCHEDULE;
+//                botState = userDataCache.getUsersCurrentBotState(userId);
+                userDataCache.setUsersCurrentBotState(userId, botState);
+                replyMessage = botStateContext.processInputMessage(botState, message);
                 break;
         }
 
-        userDataCache.setUsersCurrentBotState(userId, botState);
-
-        replyMessage = botStateContext.processInputMessage(botState, message);
+//        userDataCache.setUsersCurrentBotState(userId, botState);
+//
+//        replyMessage = botStateContext.processInputMessage(botState, message);
 
         return replyMessage;
     }
@@ -77,23 +97,23 @@ public class TelegramInterface {
         BotApiMethod<?> callBackAnswer = mainMenuService.getMainMenuMessage(chatId, "Воспользуйтесь главным меню");
 
         String userInput = buttonQuery.getData();
-        userInput = userInput.split(" ")[0];
-
-        if (userInput.equals("buttonDate")) {
-            callBackAnswer = new SendMessage(chatId, "Как тебя зовут ?");
-            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_CINEMA);
-        } else if (userInput.equals("buttonCinema")) {
-            callBackAnswer = sendAnswerCallbackQuery("Возвращайся, когда будешь готов", false, buttonQuery);
-        } else if (userInput.equals("buttonFilm")) {
-            callBackAnswer = sendAnswerCallbackQuery("Данная кнопка не поддерживается", true, buttonQuery);
-        } else {
+        userInput = userInput.split("/")[0];
+        String data = buttonQuery.getData().split("/")[1];
+        if (userInput.equals("buttonDate") && userDataCache.getUsersCurrentBotState(userId) == BotState.ASK_DATE) {
+            callBackAnswer = watchingScheduleHandler.askCinema(userId, data, chatId);
+        } else if (userInput.equals("buttonCinema") && userDataCache.getUsersCurrentBotState(userId) == BotState.ASK_CINEMA) {
+            callBackAnswer = watchingScheduleHandler.askFilm(userId, data, chatId);
+        } else if (userInput.equals("buttonFilm") && userDataCache.getUsersCurrentBotState(userId) == BotState.ASK_FILM) {
+            callBackAnswer = watchingScheduleHandler.watchingTable(userId, data, chatId);
+        } else if (userInput.equals("buttonFilmInfo") && userDataCache.getUsersCurrentBotState(userId) == BotState.ASK_FILM_INFO) {
+            callBackAnswer = watchingFilmInfo.watchingFilmInfo(userId, data, chatId);
+        }
+        else {
             userDataCache.setUsersCurrentBotState(userId, BotState.SHOW_MAIN_MENU);
         }
 
 
         return callBackAnswer;
-
-
     }
 
 

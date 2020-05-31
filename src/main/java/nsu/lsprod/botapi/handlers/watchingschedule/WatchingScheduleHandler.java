@@ -24,8 +24,6 @@ public class WatchingScheduleHandler implements InputMessageHandler {
     private UserDataCache userDataCache;
     private ReplyMessagesService messagesService;
     private MovieScheduleService movieScheduleService;
-    private MovieSchedule movieSchedule = new MovieSchedule();//?
-
 
     public WatchingScheduleHandler(UserDataCache userDataCache,
                                    ReplyMessagesService messagesService,
@@ -49,7 +47,6 @@ public class WatchingScheduleHandler implements InputMessageHandler {
     }
 
     private SendMessage processUsersInput(Message inputMsg) {
-        String usersAnswer = inputMsg.getText();
         int userId = inputMsg.getFrom().getId();
         long chatId = inputMsg.getChatId();
 
@@ -62,42 +59,55 @@ public class WatchingScheduleHandler implements InputMessageHandler {
             replyToUser.setReplyMarkup(getDateButtonsMarkup());
         }
 
-        if (botState.equals(BotState.ASK_CINEMA )) {
-            movieSchedule.setDate(Date.valueOf(usersAnswer));
-            replyToUser = messagesService.getReplyMessage(chatId, "reply.askCinema");
-            replyToUser.setReplyMarkup(getCinemaButtonsMarkup(movieSchedule.getDate()));
-            userDataCache.setUsersCurrentBotState(userId, BotState.ASK_FILM);
-        }
-
-        if (botState.equals(BotState.ASK_FILM)) {
-            movieSchedule.setCinema(movieScheduleService.findCinemaByName(usersAnswer));
-            replyToUser = messagesService.getReplyMessage(chatId, "reply.askFilm");
-            replyToUser.setReplyMarkup(getFilmButtonsMarkup(movieSchedule.getDate(), movieSchedule.getCinema()));
-            userDataCache.setUsersCurrentBotState(userId, BotState.WATCHING_SCHEDULE);
-        }
-
-        if (botState.equals(BotState.WATCHING_SCHEDULE)) {
-            movieSchedule.setFilm(movieScheduleService.findFilmByName(usersAnswer));
-            userDataCache.setUsersCurrentBotState(userId, BotState.SHOW_MAIN_MENU);
-            String reply = "";
-            List<Time> timeList = movieScheduleService.getFilmTime(movieSchedule.getDate(), movieSchedule.getCinema(), movieSchedule.getFilm());
-            for (Time time : timeList) {
-                reply = reply + time.toString() + " ";
-            }
-            replyToUser = messagesService.getReplyMessage(chatId, reply);
-        }
-
         return replyToUser;
     }
+
+    public SendMessage askCinema(int userId, String data, long chatId) {
+        UserInputData userInputData = userDataCache.getUserInputData(userId);
+        userInputData.setDate(Date.valueOf(data));
+        userDataCache.saveUserInputData(userId, userInputData);
+        userDataCache.setUsersCurrentBotState(userId, BotState.ASK_CINEMA);
+        SendMessage replyToUser = messagesService.getReplyMessage(chatId, "reply.askCinema");
+        replyToUser.setReplyMarkup(getCinemaButtonsMarkup(userInputData.getDate()));
+        return replyToUser;
+    }
+
+    public SendMessage askFilm(int userId, String data, long chatId) {
+        UserInputData userInputData = userDataCache.getUserInputData(userId);
+        userInputData.setCinema(movieScheduleService.findCinemaByName(data));
+        userDataCache.saveUserInputData(userId, userInputData);
+        userDataCache.setUsersCurrentBotState(userId, BotState.ASK_FILM);
+        SendMessage replyToUser = messagesService.getReplyMessage(chatId, "reply.askFilm");
+        replyToUser.setReplyMarkup(getFilmButtonsMarkup(userInputData.getDate(), userInputData.getCinema()));
+        return replyToUser;
+    }
+
+    public SendMessage watchingTable(int userId, String data, long chatId){
+        UserInputData userInputData = userDataCache.getUserInputData(userId);
+        userInputData.setFilm(movieScheduleService.findFilmByName(data));
+        userDataCache.saveUserInputData(userId, userInputData);
+        userDataCache.setUsersCurrentBotState(userId, BotState.SHOW_MAIN_MENU);
+        String reply = userInputData.getDate().toString() + " в кинотеатре \"" + userInputData.getCinema().getName() + "\" на фильм \"" + userInputData.getFilm().getName() + "\" есть следующие сеансы: \n";
+        List<Time> timeList = movieScheduleService.getFilmTime(userInputData.getDate(), userInputData.getCinema(), userInputData.getFilm());
+        for (Time time : timeList) {
+            reply = reply + time.toString() + "\n";
+        }
+        userInputData.setDate(null);
+        userInputData.setCinema(null);
+        userInputData.setFilm(null);
+
+        return new SendMessage(chatId, reply);
+    }
+
 
     private InlineKeyboardMarkup getDateButtonsMarkup() {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<Date> dateList = movieScheduleService.getAvailableDates();
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
 
-        for(Date date : dateList){
+        for (Date date : dateList) {
             InlineKeyboardButton buttonDate = new InlineKeyboardButton().setText(date.toString());
-            buttonDate.setCallbackData("buttonDate " + date.toString());
+            buttonDate.setCallbackData("buttonDate/" + date.toString());
             List<InlineKeyboardButton> keyboardButtonsRow = new ArrayList<>();
             keyboardButtonsRow.add(buttonDate);
             rowList.add(keyboardButtonsRow);
@@ -113,9 +123,9 @@ public class WatchingScheduleHandler implements InputMessageHandler {
         List<Cinema> cinemaList = movieScheduleService.getAvailableCinemasByDate(date);
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
 
-        for(Cinema cinema : cinemaList){
-            InlineKeyboardButton buttonCinema = new InlineKeyboardButton().setText(cinema.toString());
-            buttonCinema.setCallbackData("buttonCinema " + cinema.getName());
+        for (Cinema cinema : cinemaList) {
+            InlineKeyboardButton buttonCinema = new InlineKeyboardButton().setText(cinema.getName());
+            buttonCinema.setCallbackData("buttonCinema/" + cinema.getName());
             List<InlineKeyboardButton> keyboardButtonsRow = new ArrayList<>();
             keyboardButtonsRow.add(buttonCinema);
             rowList.add(keyboardButtonsRow);
@@ -131,9 +141,9 @@ public class WatchingScheduleHandler implements InputMessageHandler {
         List<Film> filmList = movieScheduleService.getAvailableFilmsByDateAndCinema(date, cinema);
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
 
-        for(Film film : filmList){
-            InlineKeyboardButton buttonFilm = new InlineKeyboardButton().setText(film.toString());
-            buttonFilm.setCallbackData("buttonFilm " + film.getName());
+        for (Film film : filmList) {
+            InlineKeyboardButton buttonFilm = new InlineKeyboardButton().setText(film.getName());
+            buttonFilm.setCallbackData("buttonFilm/" + film.getName());
             List<InlineKeyboardButton> keyboardButtonsRow = new ArrayList<>();
             keyboardButtonsRow.add(buttonFilm);
             rowList.add(keyboardButtonsRow);
@@ -144,7 +154,4 @@ public class WatchingScheduleHandler implements InputMessageHandler {
         return inlineKeyboardMarkup;
     }
 
-    public MovieSchedule getMovieSchedule() {
-        return movieSchedule;
-    }
 }

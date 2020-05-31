@@ -7,7 +7,7 @@ public enum BotState {
     ASK_DATE,
     ASK_CINEMA,
     ASK_FILM,
-    WATCHING_SCHEDULE,
+//    WATCHING_SCHEDULE,
 
     ASK_NOTIFICATION,
     ASK_SELECTED_CINEMA,
