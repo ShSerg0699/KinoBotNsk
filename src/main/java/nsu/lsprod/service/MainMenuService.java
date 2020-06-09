@@ -14,9 +14,7 @@ public class MainMenuService {
 
     public SendMessage getMainMenuMessage(final long chatId, final String textMessage) {
         final ReplyKeyboardMarkup replyKeyboardMarkup = getMainMenuKeyboard();
-        final SendMessage mainMenuMessage = createMessageWithKeyboard(chatId, textMessage, replyKeyboardMarkup);
-
-        return mainMenuMessage;
+        return createMessageWithKeyboard(chatId, textMessage, replyKeyboardMarkup);
     }
 
     private ReplyKeyboardMarkup getMainMenuKeyboard() {

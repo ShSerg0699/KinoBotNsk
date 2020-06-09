@@ -44,8 +44,7 @@ public class KinoBotNsk extends TelegramWebhookBot {
 
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
-        final BotApiMethod<?> replyMessageToUser = telegramInterface.handleUpdate(update);
-        return replyMessageToUser;
+        return telegramInterface.handleUpdate(update);
     }
 
 

@@ -1,6 +1,6 @@
 package nsu.lsprod.botapi;
 
-import nsu.lsprod.botapi.handlers.WatchingFilmInfo;
+import nsu.lsprod.botapi.handlers.WatchingFilmInfoHandler;
 import nsu.lsprod.botapi.handlers.watchingschedule.WatchingScheduleHandler;
 import nsu.lsprod.cache.UserDataCache;
 import nsu.lsprod.database.service.MovieScheduleService;
@@ -19,16 +19,16 @@ public class TelegramInterface {
     private UserDataCache userDataCache;
     private MainMenuService mainMenuService;
     private WatchingScheduleHandler watchingScheduleHandler;
-    private WatchingFilmInfo watchingFilmInfo;
+    private WatchingFilmInfoHandler watchingFilmInfoHandler;
 
 
 
-    public TelegramInterface(BotStateContext botStateContext, UserDataCache userDataCache, MainMenuService mainMenuService, MovieScheduleService movieScheduleService, WatchingScheduleHandler watchingScheduleHandler, WatchingFilmInfo watchingFilmInfo) {
+    public TelegramInterface(BotStateContext botStateContext, UserDataCache userDataCache, MainMenuService mainMenuService, WatchingScheduleHandler watchingScheduleHandler, WatchingFilmInfoHandler watchingFilmInfoHandler) {
         this.botStateContext = botStateContext;
         this.userDataCache = userDataCache;
         this.mainMenuService = mainMenuService;
         this.watchingScheduleHandler = watchingScheduleHandler;
-        this.watchingFilmInfo = watchingFilmInfo;
+        this.watchingFilmInfoHandler = watchingFilmInfoHandler;
     }
 
     public BotApiMethod<?> handleUpdate(Update update) {
@@ -106,7 +106,7 @@ public class TelegramInterface {
         } else if (userInput.equals("buttonFilm") && userDataCache.getUsersCurrentBotState(userId) == BotState.ASK_FILM) {
             callBackAnswer = watchingScheduleHandler.watchingTable(userId, data, chatId);
         } else if (userInput.equals("buttonFilmInfo") && userDataCache.getUsersCurrentBotState(userId) == BotState.ASK_FILM_INFO) {
-            callBackAnswer = watchingFilmInfo.watchingFilmInfo(userId, data, chatId);
+            callBackAnswer = watchingFilmInfoHandler.watchingFilmInfo(userId, data, chatId);
         }
         else {
             userDataCache.setUsersCurrentBotState(userId, BotState.SHOW_MAIN_MENU);

@@ -2,9 +2,7 @@ package nsu.lsprod.botapi.handlers;
 
 import nsu.lsprod.botapi.BotState;
 import nsu.lsprod.botapi.InputMessageHandler;
-import nsu.lsprod.botapi.handlers.watchingschedule.UserInputData;
 import nsu.lsprod.cache.UserDataCache;
-import nsu.lsprod.database.entity.Cinema;
 import nsu.lsprod.database.entity.Film;
 import nsu.lsprod.database.service.MovieScheduleService;
 import nsu.lsprod.service.ReplyMessagesService;
@@ -14,18 +12,16 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import java.sql.Date;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class WatchingFilmInfo implements InputMessageHandler {
+public class WatchingFilmInfoHandler implements InputMessageHandler {
     private UserDataCache userDataCache;
     private ReplyMessagesService messagesService;
     private MovieScheduleService movieScheduleService;
 
-    public WatchingFilmInfo(UserDataCache userDataCache,
+    public WatchingFilmInfoHandler(UserDataCache userDataCache,
                                    ReplyMessagesService messagesService,
                                    MovieScheduleService movieScheduleService) {
         this.userDataCache = userDataCache;

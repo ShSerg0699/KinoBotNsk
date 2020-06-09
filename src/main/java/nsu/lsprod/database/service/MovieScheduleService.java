@@ -19,10 +19,9 @@ import java.util.Optional;
 
 @Service
 public class MovieScheduleService {
-    private final MovieScheduleRepository movieScheduleRepository;
-    private final CinemaRepository cinemaRepository;
-    private final FilmRepository filmRepository;
-    private MovieSchedule movieSchedule = new MovieSchedule();
+    private MovieScheduleRepository movieScheduleRepository;
+    private CinemaRepository cinemaRepository;
+    private FilmRepository filmRepository;
 
     @Autowired
     public MovieScheduleService(MovieScheduleRepository movieScheduleRepository, CinemaRepository cinemaRepository, FilmRepository filmRepository) {
