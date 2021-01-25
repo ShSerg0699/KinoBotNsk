@@ -1,17 +1,10 @@
 package nsu.lsprod.botapi;
 
-import nsu.lsprod.database.service.MovieScheduleService;
-import org.telegram.telegrambots.bots.DefaultBotOptions;
-        import org.telegram.telegrambots.bots.TelegramWebhookBot;
-        import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-        import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.ArrayList;
+import org.telegram.telegrambots.bots.DefaultBotOptions;
+import org.telegram.telegrambots.bots.TelegramWebhookBot;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 public class KinoBotNsk extends TelegramWebhookBot {
     private String webHookPath;
@@ -44,7 +37,8 @@ public class KinoBotNsk extends TelegramWebhookBot {
 
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
-        return telegramInterface.handleUpdate(update);
+        final BotApiMethod<?> replyMessageToUser = telegramInterface.handleUpdate(update);
+        return replyMessageToUser;
     }
 
 

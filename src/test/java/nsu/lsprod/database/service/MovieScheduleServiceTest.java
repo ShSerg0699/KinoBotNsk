@@ -55,7 +55,7 @@ public class MovieScheduleServiceTest extends TestCase {
     public void testGetAvailableDates() {
         List<Date> dateList = new ArrayList<>();
         dateList.add(Date.valueOf("2020-06-01"));
-
+        
         List<MovieSchedule> movieScheduleList = new ArrayList<>();
         MovieSchedule movieSchedule1 = new MovieSchedule();
         movieSchedule1.setDate(Date.valueOf("2020-06-01"));

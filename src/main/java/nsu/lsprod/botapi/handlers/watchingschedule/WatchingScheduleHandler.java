@@ -5,7 +5,6 @@ import nsu.lsprod.botapi.InputMessageHandler;
 import nsu.lsprod.cache.UserDataCache;
 import nsu.lsprod.database.entity.Cinema;
 import nsu.lsprod.database.entity.Film;
-import nsu.lsprod.database.entity.MovieSchedule;
 import nsu.lsprod.database.service.MovieScheduleService;
 import nsu.lsprod.service.ReplyMessagesService;
 import org.springframework.stereotype.Component;

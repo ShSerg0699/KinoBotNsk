@@ -23,6 +23,7 @@ public class MovieScheduleService {
     private CinemaRepository cinemaRepository;
     private FilmRepository filmRepository;
 
+
     @Autowired
     public MovieScheduleService(MovieScheduleRepository movieScheduleRepository, CinemaRepository cinemaRepository, FilmRepository filmRepository) {
         this.movieScheduleRepository = movieScheduleRepository;
@@ -149,8 +150,7 @@ public class MovieScheduleService {
         if(!optionalCinema.isPresent()){
             return null;
         }
-        Cinema cinema = optionalCinema.get();
-        return  cinema;
+        return  optionalCinema.get();
     }
 
     public Film findFilmByName(String name){
@@ -158,7 +158,6 @@ public class MovieScheduleService {
         if(!optionalFilm.isPresent()){
             return null;
         }
-        Film film = optionalFilm.get();
-        return film;
+        return optionalFilm.get();
     }
 }

@@ -5,19 +5,34 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.1.RELEASE</version>
+        <version>2.2.0.RELEASE</version>
     </parent>
     <groupId>LSproduction</groupId>
     <artifactId>KinoBotNsk</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
-    <name>rest-service</name>
-    <description>Demo project for Spring Boot</description>
+    <name>kinobotnsk</name>
+    <description>Telegram bot kinoafisha</description>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
         <java.version>11</java.version>
+		<maven.compiler.release>11</maven.compiler.release>
+        <sonar.host.url>http://84.237.50.237:9000</sonar.host.url>
+		<sonar.login>d2306b93df88d1aeffefe166b7d4613d59e88b84</sonar.login>
+		<sonar.projectKey>LSproduction:KinoBotNsk</sonar.projectKey>
+		<sonar.jacoco.reportPath>${project.build.directory}/coverage-reports/jacoco-ut.exec</sonar.jacoco.reportPath>
+		<sonar.coverage.exclusions>
+			**/database/entity/*,
+			**/database/repository/*,
+			**/botconfig/*,
+			**/controller/*,
+			**/KinoBotApplication.java,
+			**/botapi/KinoBotNsk.java,
+			**/botapi/handlers/watchingschedule/UserInputData.java,
+			**/service/ReplyMessagesService.java,
+			**/service/LocaleMessageService.java
+		</sonar.coverage.exclusions>
+
     </properties>
 
     <dependencies>
@@ -58,20 +73,52 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.dbunit</groupId>
-            <artifactId>dbunit</artifactId>
-            <version>2.4.9</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-test</artifactId>
-            <version>2.3.0.RELEASE</version>
-            <scope>test</scope>
-        </dependency>
+			<groupId>org.sonarsource.scanner.maven</groupId>
+			<artifactId>sonar-maven-plugin</artifactId>
+			<version>3.7.0.1746</version>
+		</dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.5</version>
+
+				<executions>
+
+					<execution>
+						<id>default-prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<destFile>${sonar.jacoco.reportPath}</destFile>
+							<propertyName>surefireArgLine</propertyName>
+						</configuration>
+					</execution>
+					<execution>
+						<id>default-report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<dataFile>${sonar.jacoco.reportPath}</dataFile>
+							<outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+            <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0-M4</version>
+				<configuration>
+					<argLine>@{surefireArgLine}</argLine>
+				</configuration>
+			</plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

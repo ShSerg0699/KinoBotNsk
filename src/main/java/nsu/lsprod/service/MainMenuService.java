@@ -14,7 +14,9 @@ public class MainMenuService {
 
     public SendMessage getMainMenuMessage(final long chatId, final String textMessage) {
         final ReplyKeyboardMarkup replyKeyboardMarkup = getMainMenuKeyboard();
-        return createMessageWithKeyboard(chatId, textMessage, replyKeyboardMarkup);
+        final SendMessage mainMenuMessage = createMessageWithKeyboard(chatId, textMessage, replyKeyboardMarkup);
+
+        return mainMenuMessage;
     }
 
     private ReplyKeyboardMarkup getMainMenuKeyboard() {
@@ -28,13 +30,10 @@ public class MainMenuService {
 
         KeyboardRow row1 = new KeyboardRow();
         KeyboardRow row2 = new KeyboardRow();
-//        KeyboardRow row3 = new KeyboardRow();
         row1.add(new KeyboardButton("Посмотреть расписание"));
         row2.add(new KeyboardButton("Посмотреть информацию о фильмах"));
-//        row3.add(new KeyboardButton("Настройки"));
         keyboard.add(row1);
         keyboard.add(row2);
-//        keyboard.add(row3);
         replyKeyboardMarkup.setKeyboard(keyboard);
         return replyKeyboardMarkup;
     }

@@ -6,7 +6,6 @@ import nsu.lsprod.cache.UserDataCache;
 import nsu.lsprod.database.service.MovieScheduleService;
 import nsu.lsprod.service.MainMenuService;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -23,7 +22,7 @@ public class TelegramInterface {
 
 
 
-    public TelegramInterface(BotStateContext botStateContext, UserDataCache userDataCache, MainMenuService mainMenuService, WatchingScheduleHandler watchingScheduleHandler, WatchingFilmInfoHandler watchingFilmInfoHandler) {
+    public TelegramInterface(BotStateContext botStateContext, UserDataCache userDataCache, MainMenuService mainMenuService, MovieScheduleService movieScheduleService, WatchingScheduleHandler watchingScheduleHandler, WatchingFilmInfoHandler watchingFilmInfoHandler) {
         this.botStateContext = botStateContext;
         this.userDataCache = userDataCache;
         this.mainMenuService = mainMenuService;
@@ -57,36 +56,19 @@ public class TelegramInterface {
         switch (inputMsg) {
             case "/start":
                 botState = BotState.SHOW_MAIN_MENU;
-                userDataCache.setUsersCurrentBotState(userId, botState);
-                replyMessage = botStateContext.processInputMessage(botState, message);
                 break;
             case "Посмотреть расписание":
                 botState = BotState.SEARCHING_SCHEDULE;
-                userDataCache.setUsersCurrentBotState(userId, botState);
-                replyMessage = botStateContext.processInputMessage(botState, message);
                 break;
-//            case "Настройки":
-//                botState = BotState.SHOW_SETTING_MENU;
-//                userDataCache.setUsersCurrentBotState(userId, botState);
-//                replyMessage = botStateContext.processInputMessage(botState, message);
-//                break;
             case "Посмотреть информацию о фильмах":
                 botState = BotState.ASK_FILM_INFO;
-                userDataCache.setUsersCurrentBotState(userId, botState);
-                replyMessage = botStateContext.processInputMessage(botState, message);
                 break;
             default:
                 botState = BotState.SEARCHING_SCHEDULE;
-//                botState = userDataCache.getUsersCurrentBotState(userId);
-                userDataCache.setUsersCurrentBotState(userId, botState);
-                replyMessage = botStateContext.processInputMessage(botState, message);
                 break;
         }
-
-//        userDataCache.setUsersCurrentBotState(userId, botState);
-//
-//        replyMessage = botStateContext.processInputMessage(botState, message);
-
+        userDataCache.setUsersCurrentBotState(userId, botState);
+        replyMessage = botStateContext.processInputMessage(botState, message);
         return replyMessage;
     }
 
@@ -115,15 +97,4 @@ public class TelegramInterface {
 
         return callBackAnswer;
     }
-
-
-    private AnswerCallbackQuery sendAnswerCallbackQuery(String text, boolean alert, CallbackQuery callbackquery) {
-        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
-        answerCallbackQuery.setCallbackQueryId(callbackquery.getId());
-        answerCallbackQuery.setShowAlert(alert);
-        answerCallbackQuery.setText(text);
-        return answerCallbackQuery;
-    }
-
-
 }
